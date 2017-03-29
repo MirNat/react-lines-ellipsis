@@ -1,4 +1,5 @@
 ﻿const React = require('react')
+const { findDOMNode } = require('react-dom')
 const {canvasStyle, mirrorProps} = require('./common')
 
 function prevSibling (node, count) {
@@ -32,7 +33,7 @@ class LinesEllipsis extends React.Component {
     this.initCanvas()
     this.reflow(this.props)
 
-    this.canvas.addEventListener('resize', handleResize)
+    addEventListener('resize', handleResize)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -40,6 +41,7 @@ class LinesEllipsis extends React.Component {
   }
 
   componentWillUnmount () {
+    removeEventListener('resize', handleResize)
     this.canvas.parentNode.removeChild(this.canvas)
   }
 

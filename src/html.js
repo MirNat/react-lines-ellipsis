@@ -9,6 +9,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var React = require('react');
+var _requireDOM = require('react-dom'),
+    findDOMNode = _requireDOM.findDOMNode;
 
 var _require = require('./common'),
     canvasStyle = _require.canvasStyle,
@@ -108,7 +110,7 @@ var HTMLEllipsis = function (_React$Component) {
     value: function componentDidMount() {
       this.initCanvas();
       this.reflow(this.props);
-      this.canvas.addEventListener('resize', this.handleResize)
+      addEventListener('resize', this.handleResize)
     }
   }, {
     key: 'componentWillReceiveProps',
@@ -118,6 +120,7 @@ var HTMLEllipsis = function (_React$Component) {
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
+      removeEventListener('resize', this.handleResize)
       this.canvas.parentNode.removeChild(this.canvas);
     }
   }, {
