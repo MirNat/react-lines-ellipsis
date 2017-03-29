@@ -110,7 +110,7 @@ var HTMLEllipsis = function (_React$Component) {
     value: function componentDidMount() {
       this.initCanvas();
       this.reflow(this.props);
-      addEventListener('resize', this.handleResize.bind(this))
+      addEventListener('resize', this.handleResize.bind(this));
     }
   }, {
     key: 'componentWillReceiveProps',
@@ -121,8 +121,7 @@ var HTMLEllipsis = function (_React$Component) {
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      //removeEventListener('resize', this.handleResize)
-      //this.canvas.parentNode.removeChild(this.canvas);
+      removeEventListener('resize', this.handleResize);
     }
   }, {
     key: 'handleResize',

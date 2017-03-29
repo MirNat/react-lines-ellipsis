@@ -36,13 +36,12 @@ class LinesEllipsis extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
-    this.initCanvas();
+    this.initCanvas()
     this.reflow(nextProps)
   }
 
   componentWillUnmount () {
-    //removeEventListener('resize', handleResize)
-    //this.canvas.parentNode.removeChild(this.canvas)
+    removeEventListener('resize', handleResize)
   }
 
   handleResize (event) {
