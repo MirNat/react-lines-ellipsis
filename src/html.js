@@ -108,7 +108,7 @@ var HTMLEllipsis = function (_React$Component) {
     value: function componentDidMount() {
       this.initCanvas();
       this.reflow(this.props);
-      this.canvas.addEventListener('resize', handleResize)
+      this.canvas.addEventListener('resize', this.handleResize)
     }
   }, {
     key: 'componentWillReceiveProps',
