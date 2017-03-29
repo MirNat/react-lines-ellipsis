@@ -40,8 +40,8 @@ class LinesEllipsis extends React.Component {
   }
 
   componentWillUnmount () {
-    removeEventListener('resize', handleResize)
-    this.canvas.parentNode.removeChild(this.canvas)
+    //removeEventListener('resize', handleResize)
+    //this.canvas.parentNode.removeChild(this.canvas)
   }
 
   handleResize (event) {

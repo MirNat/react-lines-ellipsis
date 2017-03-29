@@ -120,8 +120,8 @@ var HTMLEllipsis = function (_React$Component) {
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      removeEventListener('resize', this.handleResize)
-      this.canvas.parentNode.removeChild(this.canvas);
+      //removeEventListener('resize', this.handleResize)
+      //this.canvas.parentNode.removeChild(this.canvas);
     }
   }, {
     key: 'handleResize',
