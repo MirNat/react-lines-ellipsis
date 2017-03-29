@@ -115,6 +115,7 @@ var HTMLEllipsis = function (_React$Component) {
   }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
+      this.initCanvas();
       this.reflow(nextProps);
     }
   }, {

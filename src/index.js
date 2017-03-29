@@ -36,6 +36,7 @@ class LinesEllipsis extends React.Component {
   }
 
   componentWillReceiveProps (nextProps) {
+    this.initCanvas();
     this.reflow(nextProps)
   }
 
