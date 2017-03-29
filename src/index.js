@@ -32,7 +32,7 @@ class LinesEllipsis extends React.Component {
     this.initCanvas()
     this.reflow(this.props)
 
-    document.canvas.addEventListener('resize', handleResize)
+    this.canvas.addEventListener('resize', handleResize)
   }
 
   componentWillReceiveProps (nextProps) {

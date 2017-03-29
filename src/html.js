@@ -1,68 +1,80 @@
-const React = require('react')
-const {canvasStyle, mirrorProps} = require('./common')
+﻿'use strict';
 
-function hookNode (node, basedOn) {
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = require('react');
+
+var _require = require('./common'),
+    canvasStyle = _require.canvasStyle,
+    mirrorProps = _require.mirrorProps;
+
+function hookNode(node, basedOn) {
   /* eslint-env browser */
   if (basedOn !== 'letters' && basedOn !== 'words') {
-    throw new Error(`Unsupported options basedOn: ${basedOn}`)
+    throw new Error('Unsupported options basedOn: ' + basedOn);
   }
   if (node.nodeType === Node.TEXT_NODE) {
-    const frag = document.createDocumentFragment()
-    let units
-    switch (basedOn) {
-      case 'words':
-        units = node.textContent.split(/\b|(?=\W)/)
-        break
-      case 'letters':
-        units = Array.from(node.textContent)
-        break
-    }
-    units.forEach((unit) => {
-      frag.appendChild(dummySpan(unit))
-    })
-    node.parentNode.replaceChild(frag, node)
+    (function () {
+      var frag = document.createDocumentFragment();
+      var units = void 0;
+      switch (basedOn) {
+        case 'words':
+          units = node.textContent.split(/\b|(?=\W)/);
+          break;
+        case 'letters':
+          units = Array.from(node.textContent);
+          break;
+      }
+      units.forEach(function (unit) {
+        frag.appendChild(dummySpan(unit));
+      });
+      node.parentNode.replaceChild(frag, node);
+    })();
   } else if (node.nodeType === Node.ELEMENT_NODE) {
-    const nodes = [].slice.call(node.childNodes)
-    const len = nodes.length
-    for (let i = 0; i < len; i++) {
-      hookNode(nodes[i], basedOn)
+    var nodes = [].slice.call(node.childNodes);
+    var len = nodes.length;
+    for (var i = 0; i < len; i++) {
+      hookNode(nodes[i], basedOn);
     }
   }
 }
 
-function dummySpan (text) {
-  const span = document.createElement('span')
-  span.className = 'LinesEllipsis-unit'
-  span.textContent = text
-  return span
+function dummySpan(text) {
+  var span = document.createElement('span');
+  span.className = 'LinesEllipsis-unit';
+  span.textContent = text;
+  return span;
 }
 
-function unwrapTextNode (node) {
-  node.parentNode.replaceChild(
-    document.createTextNode(node.textContent),
-    node
-  )
+function unwrapTextNode(node) {
+  node.parentNode.replaceChild(document.createTextNode(node.textContent), node);
 }
 
-function removeFollowingElementLeaves (node, root) {
-  if (!root.contains(node) || node === root) return
+function removeFollowingElementLeaves(node, root) {
+  if (!root.contains(node) || node === root) return;
   while (node.nextElementSibling) {
-    node.parentNode.removeChild(node.nextElementSibling)
+    node.parentNode.removeChild(node.nextElementSibling);
   }
-  removeFollowingElementLeaves(node.parentNode, root)
+  removeFollowingElementLeaves(node.parentNode, root);
 }
 
-function findBlockAncestor (node) {
-  let ndAncestor = node
-  while ((ndAncestor = ndAncestor.parentNode)) {
+function findBlockAncestor(node) {
+  var ndAncestor = node;
+  while (ndAncestor = ndAncestor.parentNode) {
     if (/p|div|main|section|h\d|ul|ol|li/.test(ndAncestor.tagName.toLowerCase())) {
-      return ndAncestor
+      return ndAncestor;
     }
   }
 }
 
-function affectLayout (ndUnit) {
-  return !!(ndUnit.offsetHeight && (ndUnit.offsetWidth || /\S/.test(ndUnit.textContent)))
+function affectLayout(ndUnit) {
+  return !!(ndUnit.offsetHeight && (ndUnit.offsetWidth || /\S/.test(ndUnit.textContent)));
 }
 
 /**
@@ -72,131 +84,164 @@ function affectLayout (ndUnit) {
  * props.basedOn {String} letters|words
  * props.className {String}
  */
-class HTMLEllipsis extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {
+
+var HTMLEllipsis = function (_React$Component) {
+  _inherits(HTMLEllipsis, _React$Component);
+
+  function HTMLEllipsis(props) {
+    _classCallCheck(this, HTMLEllipsis);
+
+    var _this = _possibleConstructorReturn(this, (HTMLEllipsis.__proto__ || Object.getPrototypeOf(HTMLEllipsis)).call(this, props));
+
+    _this.state = {
       html: props.unsafeHTML,
       clamped: false
+    };
+    _this.canvas = null;
+    _this.maxLine = 0;
+    _this.nlUnits = [];
+    return _this;
+  }
+
+  _createClass(HTMLEllipsis, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.initCanvas();
+      this.reflow(this.props);
+      this.canvas.addEventListener('resize', handleResize)
     }
-    this.canvas = null
-    this.maxLine = 0
-    this.nlUnits = []
-  }
-
-  componentDidMount () {
-    this.initCanvas()
-    this.reflow(this.props)
-  }
-
-  componentWillReceiveProps (nextProps) {
-    this.reflow(nextProps)
-  }
-
-  componentWillUnmount () {
-    this.canvas.parentNode.removeChild(this.canvas)
-  }
-
-  initCanvas () {
-    if (this.canvas) return
-    const canvas = this.canvas = document.createElement('div')
-    canvas.className = `LinesEllipsis-canvas ${this.props.className}`
-    const targetStyle = window.getComputedStyle(this.target)
-    mirrorProps.forEach((key) => {
-      canvas.style[key] = targetStyle[key]
-    })
-    Object.keys(canvasStyle).forEach((key) => {
-      canvas.style[key] = canvasStyle[key]
-    })
-    document.body.appendChild(canvas)
-  }
-
-  reflow (props) {
-    /* eslint-disable no-control-regex */
-    this.maxLine = +props.maxLine || 1
-    this.canvas.innerHTML = props.unsafeHTML
-    const basedOn = props.basedOn || /^[\x00-\x7F]+$/.test(props.unsafeHTML) ? 'words' : 'letters'
-    hookNode(this.canvas, basedOn)
-    const clamped = this.putEllipsis(this.calcIndexes())
-    this.setState({clamped})
-    if (clamped) {
-      this.setState({html: this.canvas.innerHTML})
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      this.reflow(nextProps);
     }
-  }
-
-  calcIndexes () {
-    const indexes = [0]
-    const nlUnits = this.nlUnits = Array.from(this.canvas.querySelectorAll('.LinesEllipsis-unit'))
-    const len = nlUnits.length
-    if (!nlUnits.length) return indexes
-
-    let line = 1
-    let offsetTop = nlUnits[0].offsetTop
-    for (let i = 1; i < len; i++) {
-      if (affectLayout(nlUnits[i]) && nlUnits[i].offsetTop - offsetTop > 1) {
-        line++
-        indexes.push(i)
-        offsetTop = nlUnits[i].offsetTop
-        if (line > this.maxLine) {
-          break
-        }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      this.canvas.parentNode.removeChild(this.canvas);
+    }
+  }, {
+    key: 'handleResize',
+    value: function handleResize() {
+      this.initCanvas();
+      this.reflow(this.props);
+    }
+  }, {
+    key: 'initCanvas',
+    value: function initCanvas() {
+      if (this.canvas) return;
+      var canvas = this.canvas = document.createElement('div');
+      canvas.className = 'LinesEllipsis-canvas ' + this.props.className;
+      var targetStyle = window.getComputedStyle(this.target);
+      mirrorProps.forEach(function (key) {
+        canvas.style[key] = targetStyle[key];
+      });
+      Object.keys(canvasStyle).forEach(function (key) {
+        canvas.style[key] = canvasStyle[key];
+      });
+      document.body.appendChild(canvas);
+    }
+  }, {
+    key: 'reflow',
+    value: function reflow(props) {
+      /* eslint-disable no-control-regex */
+      this.maxLine = +props.maxLine || 1;
+      this.canvas.innerHTML = props.unsafeHTML;
+      var basedOn = props.basedOn || /^[\x00-\x7F]+$/.test(props.unsafeHTML) ? 'words' : 'letters';
+      hookNode(this.canvas, basedOn);
+      var clamped = this.putEllipsis(this.calcIndexes());
+      this.setState({ clamped: clamped });
+      if (clamped) {
+        this.setState({ html: this.canvas.innerHTML });
       }
     }
-    return indexes
-  }
+  }, {
+    key: 'calcIndexes',
+    value: function calcIndexes() {
+      var indexes = [0];
+      var nlUnits = this.nlUnits = Array.from(this.canvas.querySelectorAll('.LinesEllipsis-unit'));
+      var len = nlUnits.length;
+      if (!nlUnits.length) return indexes;
 
-  putEllipsis (indexes) {
-    if (indexes.length <= this.maxLine) return false
-    this.nlUnits = this.nlUnits.slice(0, indexes[this.maxLine])
-    let ndPrevUnit = this.nlUnits.pop()
-    removeFollowingElementLeaves(ndPrevUnit, this.canvas)
-    const ndEllipsis = this.makeEllipsisSpan()
-    findBlockAncestor(ndPrevUnit).appendChild(ndEllipsis)
-
-    while (ndPrevUnit && (
-      !affectLayout(ndPrevUnit) ||
-      ndEllipsis.offsetHeight > ndPrevUnit.offsetHeight ||
-      ndEllipsis.offsetTop > ndPrevUnit.offsetTop)
-    ) {
-      ndPrevUnit = this.nlUnits.pop()
-      removeFollowingElementLeaves(ndPrevUnit, this.canvas)
-      findBlockAncestor(ndPrevUnit).appendChild(ndEllipsis)
+      var line = 1;
+      var offsetTop = nlUnits[0].offsetTop;
+      for (var i = 1; i < len; i++) {
+        if (affectLayout(nlUnits[i]) && nlUnits[i].offsetTop - offsetTop > 1) {
+          line++;
+          indexes.push(i);
+          offsetTop = nlUnits[i].offsetTop;
+          if (line > this.maxLine) {
+            break;
+          }
+        }
+      }
+      return indexes;
     }
-    unwrapTextNode(ndPrevUnit)
-    this.nlUnits.forEach(unwrapTextNode)
+  }, {
+    key: 'putEllipsis',
+    value: function putEllipsis(indexes) {
+      if (indexes.length <= this.maxLine) return false;
+      this.nlUnits = this.nlUnits.slice(0, indexes[this.maxLine]);
+      var ndPrevUnit = this.nlUnits.pop();
+      removeFollowingElementLeaves(ndPrevUnit, this.canvas);
+      var ndEllipsis = this.makeEllipsisSpan();
+      findBlockAncestor(ndPrevUnit).appendChild(ndEllipsis);
 
-    return true
-  }
+      while (ndPrevUnit && (!affectLayout(ndPrevUnit) || ndEllipsis.offsetHeight > ndPrevUnit.offsetHeight || ndEllipsis.offsetTop > ndPrevUnit.offsetTop)) {
+        ndPrevUnit = this.nlUnits.pop();
+        removeFollowingElementLeaves(ndPrevUnit, this.canvas);
+        findBlockAncestor(ndPrevUnit).appendChild(ndEllipsis);
+      }
+      unwrapTextNode(ndPrevUnit);
+      this.nlUnits.forEach(unwrapTextNode);
 
-  makeEllipsisSpan () {
-    const frag = document.createElement('span')
-    frag.appendChild(document.createElement('wbr'))
-    const ndEllipsis = document.createElement('span')
-    ndEllipsis.className = 'LinesEllipsis-ellipsis'
-    ndEllipsis.textContent = this.props.ellipsis
-    frag.appendChild(ndEllipsis)
-    return frag
-  }
+      return true;
+    }
+  }, {
+    key: 'makeEllipsisSpan',
+    value: function makeEllipsisSpan() {
+      var frag = document.createElement('span');
+      frag.appendChild(document.createElement('wbr'));
+      var ndEllipsis = document.createElement('span');
+      ndEllipsis.className = 'LinesEllipsis-ellipsis';
+      ndEllipsis.textContent = this.props.ellipsis;
+      frag.appendChild(ndEllipsis);
+      return frag;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this2 = this;
 
-  render () {
-    const {html, clamped} = this.state
-    const {className, unsafeHTML} = this.props
-    return (
-      <div
-        className={`LinesEllipsis ${clamped ? 'LinesEllipsis--clamped' : ''} ${className}`}
-        ref={node => (this.target = node)}
-      >
-        <div dangerouslySetInnerHTML={{__html: clamped ? html : unsafeHTML}} />
-      </div>
-    )
-  }
-}
+      var _state = this.state,
+          html = _state.html,
+          clamped = _state.clamped;
+      var _props = this.props,
+          className = _props.className,
+          unsafeHTML = _props.unsafeHTML;
+
+      return React.createElement(
+        'div',
+        {
+          className: 'LinesEllipsis ' + (clamped ? 'LinesEllipsis--clamped' : '') + ' ' + className,
+          ref: function ref(node) {
+            return _this2.target = node;
+          }
+        },
+        React.createElement('div', { dangerouslySetInnerHTML: { __html: clamped ? html : unsafeHTML } })
+      );
+    }
+  }]);
+
+  return HTMLEllipsis;
+}(React.Component);
 
 HTMLEllipsis.defaultProps = {
   unsafeHTML: '',
   maxLine: 1,
   ellipsis: '…', // &hellip;
   className: ''
-}
+};
 
-module.exports = HTMLEllipsis
+module.exports = HTMLEllipsis;
+
