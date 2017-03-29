@@ -50,7 +50,7 @@ class LinesEllipsis extends React.Component {
   }
 
   initCanvas () {
-    if (this.canvas) return
+    if (this.canvas) document.body.removeChild(this.canvas)
     const canvas = this.canvas = document.createElement('div')
     canvas.className = `LinesEllipsis-canvas ${this.props.className}`
     const targetStyle = window.getComputedStyle(this.target)
