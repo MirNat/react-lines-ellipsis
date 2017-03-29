@@ -132,7 +132,7 @@ var HTMLEllipsis = function (_React$Component) {
   }, {
     key: 'initCanvas',
     value: function initCanvas() {
-      if (this.canvas) document.body.removeChild(this.canvas);
+      //if (this.canvas) document.body.removeChild(this.canvas);
       var canvas = this.canvas = document.createElement('div');
       canvas.className = 'LinesEllipsis-canvas ' + this.props.className;
       var targetStyle = window.getComputedStyle(this.target);
@@ -157,6 +157,7 @@ var HTMLEllipsis = function (_React$Component) {
       if (clamped) {
         this.setState({ html: this.canvas.innerHTML });
       }
+      document.body.removeChild(this.canvas);
     }
   }, {
     key: 'calcIndexes',

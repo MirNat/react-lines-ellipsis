@@ -50,7 +50,7 @@ class LinesEllipsis extends React.Component {
   }
 
   initCanvas () {
-    if (this.canvas) document.body.removeChild(this.canvas)
+    //if (this.canvas) document.body.removeChild(this.canvas)
     const canvas = this.canvas = document.createElement('div')
     canvas.className = `LinesEllipsis-canvas ${this.props.className}`
     const targetStyle = window.getComputedStyle(this.target)
@@ -86,6 +86,7 @@ class LinesEllipsis extends React.Component {
       clamped,
       text: clamped ? this.units.slice(0, ellipsisIndex).join('') : props.text
     })
+    document.body.removeChild(this.canvas)
   }
 
   calcIndexes () {
