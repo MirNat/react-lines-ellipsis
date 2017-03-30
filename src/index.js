@@ -32,7 +32,8 @@ class LinesEllipsis extends React.Component {
   componentDidMount () {
     this.initCanvas()
     this.reflow(this.props)
-    addEventListener('resize', this.handleResize.bind(this))
+    this.bindedHandleResize = this.handleResize.bind(this)
+    addEventListener('resize', this.bindedHandleResize)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -41,7 +42,7 @@ class LinesEllipsis extends React.Component {
   }
 
   componentWillUnmount () {
-    removeEventListener('resize', handleResize)
+    removeEventListener('resize', this.bindedHandleResize)
   }
 
   handleResize (event) {
